@@ -1,0 +1,6 @@
+# Generated from CLion C/C++ Code Style settings
+BasedOnStyle: LLVM
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 120
+AllowShortIfStatementsOnASingleLine: true

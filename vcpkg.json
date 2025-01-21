@@ -1,0 +1,98 @@
+{
+  "dependencies": [
+    {
+      "name": "abseil",
+      "version>=": "20240116.2"
+    },
+    {
+      "name": "fmt",
+      "version>=": "10.2.1"
+    },
+    {
+      "name": "grpc",
+      "version>=": "1.60.0"
+    },
+    {
+      "name": "jemalloc",
+      "version>=": "5.3.0"
+    },
+    {
+      "name": "libcgroup",
+      "version>=": "3.1.0"
+    },
+    {
+      "name": "libevent",
+      "version>=": "2.1.12",
+      "features": [
+        "openssl"
+      ]
+    },
+    {
+      "name": "nlohmann-json",
+      "version>=": "3.11.3"
+    },
+    {
+      "name": "openssl",
+      "version>=": "3.3.1"
+    },
+    {
+      "name": "prometheus-cpp",
+      "version>=": "1.2.4"
+    },
+    {
+      "name": "protobuf",
+      "version>=": "4.25.1"
+    },
+    {
+      "name": "utf8-range",
+      "version>=": "4.25.1"
+    },
+    "spdlog"
+  ],
+  "overrides": [
+    {
+      "name": "abseil",
+      "version": "20240116.2"
+    },
+    {
+      "name": "fmt",
+      "version": "10.2.1"
+    },
+    {
+      "name": "grpc",
+      "version": "1.60.0"
+    },
+    {
+      "name": "jemalloc",
+      "version": "5.3.0"
+    },
+    {
+      "name": "libcgroup",
+      "version": "3.1.0"
+    },
+    {
+      "name": "libevent",
+      "version": "2.1.12"
+    },
+    {
+      "name": "nlohmann-json",
+      "version": "3.11.3"
+    },
+    {
+      "name": "openssl",
+      "version": "3.3.1"
+    },
+    {
+      "name": "prometheus-cpp",
+      "version": "1.2.4"
+    },
+    {
+      "name": "protobuf",
+      "version": "4.25.1"
+    },
+    {
+      "name": "utf8-range",
+      "version": "4.25.1"
+    }
+  ]
+}
