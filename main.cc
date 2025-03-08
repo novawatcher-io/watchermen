@@ -15,7 +15,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-constexpr const char *kPidFile = "/tmp/watchermen.pid"; // another option is /var/run/
+constexpr const char *kPidFile = "watchermen.pid"; // another option is /var/run/
 #define VERSION "0.5"
 
 #ifndef GIT_HASH

@@ -100,6 +100,7 @@ struct AsyncServerStreamingCall : public grpc::ClientReadReactor<ResponseType> {
   ResponseType response{};
   std::function<void(const ResponseType &)> callback;
   std::function<void()> error_cb;
+  std::function<void()> finish_cb;
   explicit AsyncServerStreamingCall(const std::string &company_uuid) {
     context.AddMetadata("company_uuid", company_uuid);
     SPDLOG_INFO("create async stream call, addr={}", (void *)this);
@@ -108,6 +109,7 @@ struct AsyncServerStreamingCall : public grpc::ClientReadReactor<ResponseType> {
     // todo: figure out a better solution
     if (s.ok()) {
       SPDLOG_INFO("server shutdown channel");
+      finish_cb();
     } else {
       SPDLOG_INFO("async stream call error: code={}, message={}, addr={}", static_cast<int>(s.error_code()),
                   s.error_message(), (void *)this);
@@ -166,7 +168,10 @@ void ConfigClient::OnRegisterResponse(const grpc::Status &s, const agent::AgentR
 void ConfigClient::AgentRegisterAsync() {
   auto &local_config = config_listener_->GetConfig();
   auto *call = new AsyncUnaryCall<AgentRegisterReq, AgentRegisterRes>(local_config.company_uuid());
-  call->callback = std::bind(&ConfigClient::OnRegisterResponse, this, _1, _2);
+  call->callback = [this, call](const grpc::Status &s, const AgentRegisterRes &res){
+    OnRegisterResponse(s, res);
+    delete call;
+  };
   call->request.set_name(hostname_);
   call->request.set_version(local_config.version());
   call->request.set_objectid(object_id_);
@@ -216,7 +221,11 @@ void ConfigClient::AgentGetConfigAsync() {
   auto &local_config = config_listener_->GetConfig();
   auto *call = new AsyncUnaryCall<AgentGetConfigReq, AgentGetConfigRes>(local_config.company_uuid());
   call->request.set_configuuid(config_uuid_);
-  call->callback = std::bind(&ConfigClient::OnGetConfigResponse, this, _1, _2);
+  // &ConfigClient::OnGetConfigResponse, this, _1, _2)
+  call->callback = [this, call](const grpc::Status &s, const AgentGetConfigRes &res){
+    OnGetConfigResponse(s, res);
+    delete call;
+  };
   stub_->async()->AgentGetConfig(&call->context, &call->request, &call->response, call);
   call->StartCall();
 }
@@ -238,7 +247,10 @@ void ConfigClient::AgentUnregisterAsync() {
   AgentUnregisterReq &request = call->request;
   request.set_objectid(object_id_);
   SPDLOG_INFO("AgentUnregisterReq request={}", request.ShortDebugString());
-  call->callback = std::bind(&ConfigClient::OnUnregisterResponse, this, _1, _2);
+  call->callback = [this, call](const grpc::Status &s, const AgentUnregisterRes &res){
+    OnUnregisterResponse(s, res);
+    delete call;
+  };
 
   stub_->async()->AgentUnregister(&call->context, &call->request, &call->response, call);
   call->StartCall();
@@ -312,7 +324,10 @@ void ConfigClient::AgentHeartbeatAsync() {
     }
     call->request.set_allocated_agentprocessinfo(agent_info);
   }
-  call->callback = std::bind(&ConfigClient::OnHeartbeatResponse, this, _1, _2);
+  call->callback = [this, call](const grpc::Status &s, const AgentHeartbeatRes &res) {
+    OnHeartbeatResponse(s, res);
+    delete call;
+  };
 
   SPDLOG_INFO("AgentHeartbeatReq request={}", call->request.ShortDebugString());
 
@@ -341,8 +356,16 @@ void ConfigClient::AgentOperateAsync() {
   auto &local_config = config_listener_->GetConfig();
   auto call = new AsyncServerStreamingCall<AgentOperateReq, AgentOperateRes>(local_config.company_uuid());
   call->request.set_objectid(object_id_);
-  call->callback = std::bind(&ConfigClient::OnServerOperate, this, _1);
-  call->error_cb = std::bind(&ConfigClient::AgentRegisterAsync, this); // restart from register
+  call->callback = [this, call](const agent::AgentOperateRes &req) {
+    OnServerOperate(req);
+  };
+  call->error_cb = [this, call]() {
+    AgentRegisterAsync();
+    delete call;
+  }; // restart from register
+  call->finish_cb = [call] {
+    delete call;
+  };
   stub_->async()->AgentOperate(&call->context, &call->request, call);
   call->StartRead(&call->response);
   call->StartCall();

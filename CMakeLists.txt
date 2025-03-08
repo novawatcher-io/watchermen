@@ -160,6 +160,7 @@ target_link_libraries(
     ${THIRD_LIBRIRES}
     ${OPENSSL_LIBRARIES}
     protobuf::libprotobuf
+    systemd
     gRPC::grpc++
     ${ABSEL_LIBARARY}
     ${LIBCGRP_LINK_LIBRARIES}
