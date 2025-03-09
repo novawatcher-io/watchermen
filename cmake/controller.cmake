@@ -1,4 +1,4 @@
-set(CONTROLLER_PROTO_PATH "${PROJECT_SOURCE_DIR}/third_party/deep_agent_payload/agent/protobuf")
+set(CONTROLLER_PROTO_PATH "${PROJECT_SOURCE_DIR}/third_party/nova-agent-payload/agent/protobuf")
 set(CONTROLLER_GENERATED_PATH "${CMAKE_BINARY_DIR}/generated/")
 
 add_library(proto-objects OBJECT 

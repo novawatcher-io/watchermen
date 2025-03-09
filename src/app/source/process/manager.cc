@@ -26,7 +26,9 @@ void Manager::start() {
     sigset->remove(SIGQUIT);
     sigset->remove(SIGUSR1);
     sigset->remove(SIGUSR2);
+    sigset->remove(SIGCHLD);
     loop->sigAdd(SIGTERM, onStop, this);
+    loop->sigAdd(SIGCHLD, onRecycle, this);
 
     // start process pool
     startProcessPool();

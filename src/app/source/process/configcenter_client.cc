@@ -109,12 +109,12 @@ struct AsyncServerStreamingCall : public grpc::ClientReadReactor<ResponseType> {
     // todo: figure out a better solution
     if (s.ok()) {
       SPDLOG_INFO("server shutdown channel");
-      finish_cb();
     } else {
       SPDLOG_INFO("async stream call error: code={}, message={}, addr={}", static_cast<int>(s.error_code()),
                   s.error_message(), (void *)this);
       if (error_cb) error_cb();
     }
+    finish_cb();
   }
   void OnReadDone(bool ok) override {
     if (!ok) {
@@ -361,7 +361,7 @@ void ConfigClient::AgentOperateAsync() {
   };
   call->error_cb = [this, call]() {
     AgentRegisterAsync();
-    delete call;
+//    delete call;
   }; // restart from register
   call->finish_cb = [call] {
     delete call;

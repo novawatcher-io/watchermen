@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <sys/wait.h>
 
 #include "config.h"
 #include "component/discovery/component.h"
@@ -33,6 +34,15 @@ public:
         }
         auto manager = static_cast<Manager*>(param);
         manager->stop();
+    }
+
+    static void onRecycle(evutil_socket_t /*sig*/, short /*events*/, void *param) {
+        pid_t pid;
+        int stat;
+
+        while((pid = waitpid(-1, &stat, WNOHANG)) > 0){
+            printf("child %d terminated\n", pid);
+        }
     }
 
     void onCreate() {};

@@ -1,4 +1,4 @@
-set(PROTO_PATH "${PROJECT_SOURCE_DIR}/third_party/deep_agent_payload/agent/protobuf")
+set(PROTO_PATH "${PROJECT_SOURCE_DIR}/third_party/nova-agent-payload/agent/protobuf")
 set(GENERATED_PROTOBUF_PATH "${CMAKE_BINARY_DIR}/generated/")
 
 set(MANAGER_PROTO "${PROTO_PATH}/watchermen/v1/manager.proto")
