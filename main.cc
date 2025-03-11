@@ -30,6 +30,7 @@ constexpr const char *kPidFile = "watchermen.pid"; // another option is /var/run
 // Define the flags
 ABSL_FLAG(std::string, c, "", "Path to the configuration file");
 ABSL_FLAG(std::string, e, "", "Execute command");
+ABSL_FLAG(std::string, n, "", "Network Connection");
 ABSL_FLAG(bool, v, false, "Show version");
 
 static int CreatePidFile(const char *pid_file) {
@@ -171,9 +172,14 @@ int main(int argc, char **argv) {
   std::unique_ptr<Core::Component::Container> container = std::make_unique<Core::Component::Container>();
   container->bind(manager->name(), {manager_config, manager});
 
-  Core::Component::Discovery::ConfigClient center_client(nullptr, manager_config.get(), manager.get(),
-                                                        manager->getLoop());
-  center_client.Start();
+  std::string is_connect_network = absl::GetFlag(FLAGS_n);
+  std::unique_ptr<Core::Component::Discovery::ConfigClient> center_client;
+  if (is_connect_network != "no") {
+      center_client = std::make_unique<Core::Component::Discovery::ConfigClient>(nullptr, manager_config.get(), manager.get(),
+                                                                               manager->getLoop());
+      center_client->Start();
+  }
+
   manager->start();
 
   return 0;
